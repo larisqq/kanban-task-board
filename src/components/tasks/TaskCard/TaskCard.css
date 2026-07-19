@@ -1,0 +1,180 @@
+.task-card {
+  padding: 16px;
+  border: 1px solid #e6e8ef;
+  border-radius: 14px;
+
+  background: #ffffff;
+  box-shadow: 0 6px 18px rgba(30, 40, 70, 0.05);
+}
+
+.task-card__top {
+  display: flex;
+  justify-content: flex-end;
+
+  margin-bottom: 12px;
+}
+
+.task-card__title {
+  margin: 0;
+
+  color: #1c2233;
+  font-size: 0.98rem;
+  line-height: 1.4;
+}
+
+.task-card__description {
+  display: -webkit-box;
+
+  margin-top: 8px;
+
+  overflow: hidden;
+
+  color: #70798c;
+  font-size: 0.85rem;
+  line-height: 1.5;
+
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.task-card__date {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  margin-top: 16px;
+
+  color: #788195;
+  font-size: 0.78rem;
+}
+
+.priority-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 4px 8px;
+
+  border-radius: 999px;
+
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.priority-badge--low {
+  background: #eaf8ef;
+  color: #25824a;
+}
+
+.priority-badge--normal {
+  background: #edf1f8;
+  color: #596579;
+}
+
+.priority-badge--high {
+  background: #fff0ee;
+  color: #c6493e;
+}
+
+.task-card {
+  touch-action: none;
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease,
+    opacity 150ms ease;
+}
+
+.task-card:hover {
+  border-color: #d9d5f3;
+  box-shadow: 0 10px 24px rgba(30, 40, 70, 0.08);
+}
+
+.task-card--dragging {
+  opacity: 0.35;
+}
+
+.task-card--overlay {
+  width: 300px;
+  cursor: grabbing;
+  border-color: #bdb2f2;
+  box-shadow:
+    0 22px 45px rgba(30, 40, 70, 0.2),
+    0 8px 18px rgba(103, 71, 232, 0.12);
+  transform: rotate(2deg);
+}
+
+.task-card__top {
+  align-items: center;
+  justify-content: space-between;
+}
+
+.task-card__drag-handle {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #a1a8b7;
+  cursor: grab;
+}
+
+.task-card__drag-handle:hover {
+  background: #f1effb;
+  color: #6747e8;
+}
+
+.task-card__drag-handle:active {
+  cursor: grabbing;
+}
+.task-card__actions {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.task-card__action-button,
+.task-card__drag-handle {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #a1a8b7;
+}
+
+.task-card__action-button:hover:not(:disabled),
+.task-card__drag-handle:hover:not(:disabled) {
+  background: #f1effb;
+  color: #6747e8;
+}
+
+.task-card__action-button--delete:hover:not(:disabled) {
+  background: #fff0ee;
+  color: #c6493e;
+}
+
+.task-card__action-button:disabled,
+.task-card__drag-handle:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.task-card--deleting {
+  pointer-events: none;
+  opacity: 0.55;
+}
+
+.task-card__deleting-message {
+  margin: 12px 0 0;
+  color: #8a93a5;
+  font-size: 0.75rem;
+  font-weight: 600;
+}

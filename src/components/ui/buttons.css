@@ -1,0 +1,68 @@
+.primary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 12px;
+  background: #6747e8;
+  color: white;
+  font-weight: 700;
+  box-shadow: 0 8px 24px rgba(103, 71, 232, 0.24);
+}
+
+.primary-button:hover:not(:disabled) {
+  background: #5938da;
+}
+
+.primary-button:disabled,
+.secondary-button:disabled,
+.icon-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
+.secondary-button {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 15px;
+  border: 1px solid #dfe3eb;
+  border-radius: 11px;
+  background: #ffffff;
+  color: #4f586b;
+  font-weight: 700;
+}
+
+.secondary-button:hover:not(:disabled) {
+  border-color: #cfd4df;
+  background: #f7f8fa;
+}
+
+.icon-button {
+  display: grid;
+  flex: 0 0 auto;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border: 1px solid #e5e8ef;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #667085;
+}
+
+.icon-button:hover:not(:disabled) {
+  border-color: #d5d9e4;
+  background: #f7f8fb;
+  color: #262d3d;
+}
+
+@media (max-width: 900px) {
+  .app-header .primary-button {
+    width: 100%;
+  }
+}
