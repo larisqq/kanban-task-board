@@ -1,7 +1,10 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Plus, RefreshCw } from "lucide-react";
 
 import TaskBoard from "./components/board/TaskBoard/TaskBoard";
+import BoardToolbar, {
+  type PriorityFilter,
+} from "./components/board/BoardToolbar/BoardToolbar";
 import TaskFormModal from "./components/tasks/TaskFormModal/TaskFormModal";
 import { useTasks } from "./hooks/useTasks";
 
@@ -11,6 +14,10 @@ function App() {
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
 
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const [priorityFilter, setPriorityFilter] = useState<PriorityFilter>("all");
 
   const {
     tasks,
@@ -25,6 +32,25 @@ function App() {
     updateTaskStatus,
     deleteTask,
   } = useTasks();
+
+  const filteredTasks = useMemo(() => {
+    const normalizedSearch = searchQuery.trim().toLowerCase();
+
+    return tasks.filter((task) => {
+      const titleMatches = task.title.toLowerCase().includes(normalizedSearch);
+
+      const descriptionMatches =
+        task.description?.toLowerCase().includes(normalizedSearch) ?? false;
+
+      const matchesSearch =
+        normalizedSearch.length === 0 || titleMatches || descriptionMatches;
+
+      const matchesPriority =
+        priorityFilter === "all" || task.priority === priorityFilter;
+
+      return matchesSearch && matchesPriority;
+    });
+  }, [tasks, searchQuery, priorityFilter]);
 
   function openCreateModal() {
     setSelectedTask(null);
@@ -96,11 +122,21 @@ function App() {
           </div>
         )}
 
+        {!isLoading && (
+          <BoardToolbar
+            tasks={tasks}
+            searchQuery={searchQuery}
+            priorityFilter={priorityFilter}
+            onSearchChange={setSearchQuery}
+            onPriorityChange={setPriorityFilter}
+          />
+        )}
+
         {isLoading && tasks.length === 0 ? (
           <div className="state-panel">Loading your workspace...</div>
         ) : (
           <TaskBoard
-            tasks={tasks}
+            tasks={filteredTasks}
             deletingTaskId={deletingTaskId}
             onTaskStatusChange={updateTaskStatus}
             onEditTask={openEditModal}
