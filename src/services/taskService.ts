@@ -4,6 +4,7 @@ import type {
   CreateTaskInput,
   Task,
   TaskStatus,
+  UpdateTaskInput,
 } from "../types/task";
 
 export async function getTasks(): Promise<Task[]> {
@@ -66,6 +67,30 @@ export async function updateTaskStatus(
     .from("tasks")
     .update({
       status,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", taskId)
+    .select()
+    .single();
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+}
+
+export async function updateTask(
+  taskId: string,
+  input: UpdateTaskInput,
+): Promise<Task> {
+  const { data, error } = await supabase
+    .from("tasks")
+    .update({
+      title: input.title.trim(),
+      description: input.description?.trim() || null,
+      priority: input.priority,
+      due_date: input.due_date || null,
       updated_at: new Date().toISOString(),
     })
     .eq("id", taskId)

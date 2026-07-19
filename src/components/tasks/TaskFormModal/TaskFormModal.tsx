@@ -1,30 +1,49 @@
+import "./TaskFormModal.css";
+
 import { useEffect, useState, type FormEvent } from "react";
 import { CalendarDays, X } from "lucide-react";
-import type { CreateTaskInput, TaskPriority } from "../../../types/task";
-import "./CreateTaskModal.css";
-interface CreateTaskModalProps {
+
+import type {
+  CreateTaskInput,
+  Task,
+  TaskPriority,
+  UpdateTaskInput,
+} from "../../../types/task";
+
+interface TaskFormModalProps {
   isOpen: boolean;
   isSubmitting: boolean;
+  task?: Task | null;
   onClose: () => void;
-  onCreate: (input: CreateTaskInput) => Promise<void>;
+  onSubmit: (input: CreateTaskInput | UpdateTaskInput) => Promise<void>;
 }
 
-const initialFormState: CreateTaskInput = {
-  title: "",
-  description: "",
-  priority: "normal",
-  due_date: null,
-};
-
-function CreateTaskModal({
+function TaskFormModal({
   isOpen,
   isSubmitting,
+  task,
   onClose,
-  onCreate,
-}: CreateTaskModalProps) {
-  const [formData, setFormData] = useState<CreateTaskInput>(initialFormState);
+  onSubmit,
+}: TaskFormModalProps) {
+  const isEditing = Boolean(task);
 
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [priority, setPriority] = useState<TaskPriority>("normal");
+  const [dueDate, setDueDate] = useState("");
   const [validationError, setValidationError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    setTitle(task?.title ?? "");
+    setDescription(task?.description ?? "");
+    setPriority(task?.priority ?? "normal");
+    setDueDate(task?.due_date ?? "");
+    setValidationError(null);
+  }, [isOpen, task]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -38,42 +57,22 @@ function CreateTaskModal({
     }
 
     document.addEventListener("keydown", handleKeyDown);
+    document.body.style.overflow = "hidden";
 
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [isOpen, isSubmitting, onClose]);
-
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    }
-
-    return () => {
       document.body.style.overflow = "";
     };
-  }, [isOpen]);
+  }, [isOpen, isSubmitting, onClose]);
 
   if (!isOpen) {
     return null;
   }
 
-  function updateField<Key extends keyof CreateTaskInput>(
-    field: Key,
-    value: CreateTaskInput[Key],
-  ) {
-    setFormData((currentFormData) => ({
-      ...currentFormData,
-      [field]: value,
-    }));
-
-    setValidationError(null);
-  }
-
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    const trimmedTitle = formData.title.trim();
+    const trimmedTitle = title.trim();
 
     if (!trimmedTitle) {
       setValidationError("Please enter a task title.");
@@ -81,66 +80,58 @@ function CreateTaskModal({
     }
 
     if (trimmedTitle.length > 150) {
-      setValidationError("The task title must contain at most 150 characters.");
+      setValidationError("The title must contain at most 150 characters.");
       return;
     }
 
-    try {
-      await onCreate({
-        ...formData,
-        title: trimmedTitle,
-        description: formData.description?.trim() || undefined,
-        due_date: formData.due_date || null,
-      });
-
-      setFormData(initialFormState);
-      setValidationError(null);
-    } catch {
-      // Eroarea de server va fi afișată de App.
-    }
-  }
-
-  function handleClose() {
-    if (isSubmitting) {
-      return;
-    }
-
-    setFormData(initialFormState);
-    setValidationError(null);
-    onClose();
+    await onSubmit({
+      title: trimmedTitle,
+      description: description.trim() || undefined,
+      priority,
+      due_date: dueDate || null,
+    });
   }
 
   return (
     <div
       className="modal-backdrop"
       role="presentation"
-      onMouseDown={handleClose}
+      onMouseDown={() => {
+        if (!isSubmitting) {
+          onClose();
+        }
+      }}
     >
       <section
         className="task-modal"
         role="dialog"
         aria-modal="true"
-        aria-labelledby="create-task-title"
+        aria-labelledby="task-form-title"
         onMouseDown={(event) => event.stopPropagation()}
       >
         <header className="task-modal__header">
           <div>
-            <p className="task-modal__eyebrow">Add to workspace</p>
+            <p className="task-modal__eyebrow">
+              {isEditing ? "Update task" : "Add to workspace"}
+            </p>
 
-            <h2 id="create-task-title">Create a new task</h2>
+            <h2 id="task-form-title">
+              {isEditing ? "Edit task" : "Create a new task"}
+            </h2>
 
             <p>
-              Add the essential details now. You can move the task across the
-              board afterward.
+              {isEditing
+                ? "Update the details of this task."
+                : "Add the essential details for your new task."}
             </p>
           </div>
 
           <button
             type="button"
             className="icon-button"
-            aria-label="Close create task modal"
+            aria-label="Close modal"
             disabled={isSubmitting}
-            onClick={handleClose}
+            onClick={onClose}
           >
             <X size={20} />
           </button>
@@ -151,18 +142,21 @@ function CreateTaskModal({
             <div className="form-field__label-row">
               <label htmlFor="task-title">Task title</label>
 
-              <span>{formData.title.length}/150</span>
+              <span>{title.length}/150</span>
             </div>
 
             <input
               id="task-title"
               type="text"
-              value={formData.title}
+              value={title}
               maxLength={150}
               autoFocus
-              placeholder="For example: Design dashboard header"
               disabled={isSubmitting}
-              onChange={(event) => updateField("title", event.target.value)}
+              placeholder="For example: Design dashboard"
+              onChange={(event) => {
+                setTitle(event.target.value);
+                setValidationError(null);
+              }}
             />
           </div>
 
@@ -174,13 +168,11 @@ function CreateTaskModal({
 
             <textarea
               id="task-description"
-              value={formData.description ?? ""}
+              value={description}
               rows={5}
-              placeholder="Add context, requirements, or useful notes..."
               disabled={isSubmitting}
-              onChange={(event) =>
-                updateField("description", event.target.value)
-              }
+              placeholder="Add context or useful notes..."
+              onChange={(event) => setDescription(event.target.value)}
             />
           </div>
 
@@ -190,10 +182,10 @@ function CreateTaskModal({
 
               <select
                 id="task-priority"
-                value={formData.priority}
+                value={priority}
                 disabled={isSubmitting}
                 onChange={(event) =>
-                  updateField("priority", event.target.value as TaskPriority)
+                  setPriority(event.target.value as TaskPriority)
                 }
               >
                 <option value="low">Low</option>
@@ -214,11 +206,9 @@ function CreateTaskModal({
                 <input
                   id="task-due-date"
                   type="date"
-                  value={formData.due_date ?? ""}
+                  value={dueDate}
                   disabled={isSubmitting}
-                  onChange={(event) =>
-                    updateField("due_date", event.target.value || null)
-                  }
+                  onChange={(event) => setDueDate(event.target.value)}
                 />
               </div>
             </div>
@@ -235,7 +225,7 @@ function CreateTaskModal({
               type="button"
               className="secondary-button"
               disabled={isSubmitting}
-              onClick={handleClose}
+              onClick={onClose}
             >
               Cancel
             </button>
@@ -245,7 +235,13 @@ function CreateTaskModal({
               className="primary-button"
               disabled={isSubmitting}
             >
-              {isSubmitting ? "Creating..." : "Create task"}
+              {isSubmitting
+                ? isEditing
+                  ? "Saving..."
+                  : "Creating..."
+                : isEditing
+                  ? "Save changes"
+                  : "Create task"}
             </button>
           </footer>
         </form>
@@ -254,4 +250,4 @@ function CreateTaskModal({
   );
 }
 
-export default CreateTaskModal;
+export default TaskFormModal;

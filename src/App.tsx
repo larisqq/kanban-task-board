@@ -2,29 +2,56 @@ import { useState } from "react";
 import { Plus, RefreshCw } from "lucide-react";
 
 import TaskBoard from "./components/board/TaskBoard/TaskBoard";
-import CreateTaskModal from "./components/tasks/CreateTaskModal/CreateTaskModal";
+import TaskFormModal from "./components/tasks/TaskFormModal/TaskFormModal";
 import { useTasks } from "./hooks/useTasks";
-import type { CreateTaskInput } from "./types/task";
+
+import type { CreateTaskInput, Task, UpdateTaskInput } from "./types/task";
 
 function App() {
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
   const {
     tasks,
     isLoading,
     isCreatingTask,
+    editingTaskId,
     deletingTaskId,
     error,
     loadTasks,
     createTask,
+    updateTask,
     updateTaskStatus,
     deleteTask,
   } = useTasks();
 
-  async function handleCreateTask(input: CreateTaskInput) {
-    await createTask(input);
-    setIsCreateModalOpen(false);
+  function openCreateModal() {
+    setSelectedTask(null);
+    setIsTaskModalOpen(true);
   }
+
+  function openEditModal(task: Task) {
+    setSelectedTask(task);
+    setIsTaskModalOpen(true);
+  }
+
+  function closeTaskModal() {
+    setIsTaskModalOpen(false);
+    setSelectedTask(null);
+  }
+
+  async function handleTaskSubmit(input: CreateTaskInput | UpdateTaskInput) {
+    if (selectedTask) {
+      await updateTask(selectedTask.id, input as UpdateTaskInput);
+    } else {
+      await createTask(input as CreateTaskInput);
+    }
+
+    closeTaskModal();
+  }
+
+  const isSubmittingTask = isCreatingTask || editingTaskId === selectedTask?.id;
 
   return (
     <div className="app-shell">
@@ -42,7 +69,7 @@ function App() {
         <button
           className="primary-button"
           type="button"
-          onClick={() => setIsCreateModalOpen(true)}
+          onClick={openCreateModal}
         >
           <Plus size={18} />
           New task
@@ -76,16 +103,18 @@ function App() {
             tasks={tasks}
             deletingTaskId={deletingTaskId}
             onTaskStatusChange={updateTaskStatus}
+            onEditTask={openEditModal}
             onDeleteTask={deleteTask}
           />
         )}
       </main>
 
-      <CreateTaskModal
-        isOpen={isCreateModalOpen}
-        isSubmitting={isCreatingTask}
-        onClose={() => setIsCreateModalOpen(false)}
-        onCreate={handleCreateTask}
+      <TaskFormModal
+        isOpen={isTaskModalOpen}
+        task={selectedTask}
+        isSubmitting={isSubmittingTask}
+        onClose={closeTaskModal}
+        onSubmit={handleTaskSubmit}
       />
     </div>
   );

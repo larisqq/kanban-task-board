@@ -9,6 +9,7 @@ import {
   createTask as createTaskRequest,
   deleteTask as deleteTaskRequest,
   getTasks,
+  updateTask as updateTaskRequest,
   updateTaskStatus as updateTaskStatusRequest,
 } from "../services/taskService";
 
@@ -16,6 +17,7 @@ import type {
   CreateTaskInput,
   Task,
   TaskStatus,
+  UpdateTaskInput,
 } from "../types/task";
 
 export function useTasks() {
@@ -23,6 +25,8 @@ export function useTasks() {
   const [isLoading, setIsLoading] = useState(true);
   const [isCreatingTask, setIsCreatingTask] =
     useState(false);
+  const [editingTaskId, setEditingTaskId] =
+    useState<string | null>(null);
   const [deletingTaskId, setDeletingTaskId] =
     useState<string | null>(null);
   const [error, setError] = useState<string | null>(
@@ -88,6 +92,45 @@ export function useTasks() {
     [],
   );
 
+  const updateTask = useCallback(
+    async (
+      taskId: string,
+      input: UpdateTaskInput,
+    ): Promise<Task> => {
+      setEditingTaskId(taskId);
+      setError(null);
+
+      try {
+        const updatedTask =
+          await updateTaskRequest(taskId, input);
+
+        setTasks((currentTasks) =>
+          currentTasks.map((task) =>
+            task.id === updatedTask.id
+              ? updatedTask
+              : task,
+          ),
+        );
+
+        return updatedTask;
+      } catch (caughtError) {
+        console.error(
+          "Could not update task:",
+          caughtError,
+        );
+
+        setError(
+          "The task could not be updated. Please try again.",
+        );
+
+        throw caughtError;
+      } finally {
+        setEditingTaskId(null);
+      }
+    },
+    [],
+  );
+
   const updateTaskStatus = useCallback(
     async (
       taskId: string,
@@ -99,6 +142,17 @@ export function useTasks() {
 
       setTasks((currentTasks) => {
         previousTasks = currentTasks;
+
+        const taskToUpdate = currentTasks.find(
+          (task) => task.id === taskId,
+        );
+
+        if (
+          !taskToUpdate ||
+          taskToUpdate.status === newStatus
+        ) {
+          return currentTasks;
+        }
 
         return currentTasks.map((task) =>
           task.id === taskId
@@ -195,10 +249,12 @@ export function useTasks() {
     tasks,
     isLoading,
     isCreatingTask,
+    editingTaskId,
     deletingTaskId,
     error,
     loadTasks,
     createTask,
+    updateTask,
     updateTaskStatus,
     deleteTask,
   };

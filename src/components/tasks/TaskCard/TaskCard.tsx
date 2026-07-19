@@ -2,7 +2,7 @@ import "./TaskCard.css";
 
 import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
-import { CalendarDays, GripVertical, Trash2 } from "lucide-react";
+import { CalendarDays, GripVertical, Pencil, Trash2 } from "lucide-react";
 
 import type { Task } from "../../../types/task";
 
@@ -10,6 +10,7 @@ interface TaskCardProps {
   task: Task;
   isOverlay?: boolean;
   isDeleting?: boolean;
+  onEdit?: (task: Task) => void;
   onDelete?: (taskId: string) => Promise<void>;
 }
 
@@ -17,6 +18,7 @@ function TaskCard({
   task,
   isOverlay = false,
   isDeleting = false,
+  onEdit,
   onDelete,
 }: TaskCardProps) {
   const { attributes, listeners, setNodeRef, transform, isDragging } =
@@ -36,16 +38,20 @@ function TaskCard({
     : undefined;
 
   async function handleDelete() {
+    if (!onDelete) {
+      return;
+    }
+
     const shouldDelete = window.confirm(`Delete "${task.title}"?`);
 
-    if (!shouldDelete || !onDelete) {
+    if (!shouldDelete) {
       return;
     }
 
     try {
       await onDelete(task.id);
     } catch {
-      // Eroarea este gestionată și afișată de useTasks.
+      // Eroarea este gestionată în useTasks.
     }
   }
 
@@ -69,6 +75,16 @@ function TaskCard({
 
         {!isOverlay && (
           <div className="task-card__actions">
+            <button
+              type="button"
+              className="task-card__action-button"
+              aria-label={`Edit task ${task.title}`}
+              disabled={isDeleting}
+              onClick={() => onEdit?.(task)}
+            >
+              <Pencil size={15} />
+            </button>
+
             <button
               type="button"
               className="task-card__action-button task-card__action-button--delete"

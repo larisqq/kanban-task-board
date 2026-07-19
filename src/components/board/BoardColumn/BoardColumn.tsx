@@ -10,6 +10,7 @@ interface BoardColumnProps {
   column: BoardColumnType;
   tasks: Task[];
   deletingTaskId: string | null;
+  onEditTask: (task: Task) => void;
   onDeleteTask: (taskId: string) => Promise<void>;
 }
 
@@ -17,6 +18,7 @@ function BoardColumn({
   column,
   tasks,
   deletingTaskId,
+  onEditTask,
   onDeleteTask,
 }: BoardColumnProps) {
   const { setNodeRef, isOver } = useDroppable({
@@ -57,6 +59,7 @@ function BoardColumn({
               key={task.id}
               task={task}
               isDeleting={deletingTaskId === task.id}
+              onEdit={onEditTask}
               onDelete={onDeleteTask}
             />
           ))

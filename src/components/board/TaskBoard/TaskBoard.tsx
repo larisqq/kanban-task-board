@@ -21,6 +21,7 @@ interface TaskBoardProps {
   tasks: Task[];
   deletingTaskId: string | null;
   onTaskStatusChange: (taskId: string, status: TaskStatus) => Promise<void>;
+  onEditTask: (task: Task) => void;
   onDeleteTask: (taskId: string) => Promise<void>;
 }
 
@@ -28,6 +29,7 @@ function TaskBoard({
   tasks,
   deletingTaskId,
   onTaskStatusChange,
+  onEditTask,
   onDeleteTask,
 }: TaskBoardProps) {
   const [activeTask, setActiveTask] = useState<Task | null>(null);
@@ -73,7 +75,7 @@ function TaskBoard({
     try {
       await onTaskStatusChange(task.id, targetStatus);
     } catch {
-      // Error handled in useTasks.
+      // Eroarea este gestionată în useTasks.
     }
   }
 
@@ -101,6 +103,7 @@ function TaskBoard({
               column={column}
               tasks={columnTasks}
               deletingTaskId={deletingTaskId}
+              onEditTask={onEditTask}
               onDeleteTask={onDeleteTask}
             />
           );
