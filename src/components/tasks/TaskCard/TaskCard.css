@@ -1,8 +1,8 @@
 .task-card {
-  padding: 16px;
+  min-height: 150px;
+  padding: 18px;
   border: 1px solid #e6e8ef;
-  border-radius: 14px;
-
+  border-radius: 16px;
   background: #ffffff;
   box-shadow: 0 6px 18px rgba(30, 40, 70, 0.05);
 }
@@ -16,12 +16,10 @@
 
 .task-card__title {
   margin: 0;
-
   color: #1c2233;
-  font-size: 0.98rem;
-  line-height: 1.4;
+  font-size: 1.02rem;
+  line-height: 1.45;
 }
-
 .task-card__description {
   display: -webkit-box;
 
