@@ -178,3 +178,22 @@
   font-size: 0.75rem;
   font-weight: 600;
 }
+
+.task-card__date--overdue {
+  color: #dc2626;
+  font-weight: 700;
+}
+
+.task-card__date--today {
+  color: #d97706;
+  font-weight: 700;
+}
+
+.task-card__date--tomorrow {
+  color: #2563eb;
+  font-weight: 700;
+}
+
+.task-card__date--future {
+  color: #6b7280;
+}

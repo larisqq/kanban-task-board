@@ -4,6 +4,14 @@ import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 import { CalendarDays, GripVertical, Pencil, Trash2 } from "lucide-react";
 
+import { getDueDateStatus } from "../../../utils/date";
+
+function formatDueDate(date?: string | null) {
+  if (!date) return "";
+  const d = new Date(date);
+  if (Number.isNaN(d.getTime())) return "";
+  return d.toLocaleDateString();
+}
 import type { Task } from "../../../types/task";
 
 interface TaskCardProps {
@@ -37,6 +45,8 @@ function TaskCard({
       }
     : undefined;
 
+  const dueDateStatus = getDueDateStatus(task.due_date);
+
   async function handleDelete() {
     if (!onDelete) {
       return;
@@ -54,6 +64,28 @@ function TaskCard({
       // Eroarea este gestionată în useTasks.
     }
   }
+
+  function getDueDateLabel(): string | null {
+    if (!task.due_date || !dueDateStatus) {
+      return null;
+    }
+
+    switch (dueDateStatus) {
+      case "overdue":
+        return "Overdue";
+
+      case "today":
+        return "Due today";
+
+      case "tomorrow":
+        return "Tomorrow";
+
+      case "future":
+        return formatDueDate(task.due_date);
+    }
+  }
+
+  const dueDateLabel = getDueDateLabel();
 
   return (
     <article
@@ -115,10 +147,16 @@ function TaskCard({
         <p className="task-card__description">{task.description}</p>
       )}
 
-      {task.due_date && (
-        <div className="task-card__date">
+      {task.due_date && dueDateStatus && dueDateLabel && (
+        <div
+          className={[
+            "task-card__date",
+            `task-card__date--${dueDateStatus}`,
+          ].join(" ")}
+        >
           <CalendarDays size={15} />
-          <span>{task.due_date}</span>
+
+          <span>{dueDateLabel}</span>
         </div>
       )}
 
