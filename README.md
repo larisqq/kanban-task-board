@@ -1,75 +1,109 @@
-# React + TypeScript + Vite
+# Kanban Task Board
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern Kanban-style task management application built with React, TypeScript, Supabase, and dnd-kit.
 
-Currently, two official plugins are available:
+The application allows users to create, edit, delete, search, filter, and visually organize tasks across four workflow stages. Each visitor is automatically authenticated through a Supabase anonymous guest session and can access only their own tasks.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Live Demo
 
-## React Compiler
+[Open the live application](https://kanban-task-board-puce.vercel.app)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## GitHub Repository
 
-## Expanding the ESLint configuration
+[View the source code](https://github.com/larisqq/kanban-task-board)
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Features
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### Core functionality
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- Kanban board with four columns:
+  - To Do
+  - In Progress
+  - In Review
+  - Done
+- Drag-and-drop task movement between columns
+- Task creation, editing, and deletion
+- Persistent task storage using Supabase
+- Automatic anonymous guest authentication
+- Row Level Security policies for user-specific data access
+- Responsive layout
+- Loading and error states
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Task details
 
-```
+Each task can contain:
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+- Title
+- Description
+- Priority
+- Due date
+- Current workflow status
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Advanced features
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- Search by task title or description
+- Filter by priority
+- Board statistics:
+  - Total tasks
+  - Completed tasks
+  - Overdue tasks
+- Due-date indicators:
+  - Overdue
+  - Due today
+  - Due tomorrow
+  - Future date
+- Custom deletion confirmation dialog
+- Optimistic UI updates for task movement and deletion
 
-```
+## Technology Stack
+
+### Frontend
+
+- React
+- TypeScript
+- Vite
+- CSS
+- dnd-kit
+- Lucide React
+
+### Backend and data
+
+- Supabase PostgreSQL
+- Supabase Authentication
+- Supabase Row Level Security
+
+### Deployment
+
+- Vercel
+- GitHub
+
+## Architecture
+
+The project separates presentation, state management, and data access responsibilities.
+
+```text
+src/
+├── components/
+│   ├── board/
+│   │   ├── BoardColumn/
+│   │   ├── BoardToolbar/
+│   │   └── TaskBoard/
+│   ├── common/
+│   │   └── ConfirmDialog/
+│   └── tasks/
+│       ├── TaskCard/
+│       └── TaskFormModal/
+├── hooks/
+│   └── useTasks.ts
+├── lib/
+│   ├── boardColumns.ts
+│   └── supabase.ts
+├── services/
+│   ├── authService.ts
+│   └── taskService.ts
+├── types/
+│   └── task.ts
+├── utils/
+│   └── date.ts
+├── App.tsx
+└── main.tsx
