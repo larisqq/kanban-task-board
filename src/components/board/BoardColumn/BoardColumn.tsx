@@ -11,7 +11,7 @@ interface BoardColumnProps {
   tasks: Task[];
   deletingTaskId: string | null;
   onEditTask: (task: Task) => void;
-  onDeleteTask: (taskId: string) => Promise<void>;
+  onDeleteTask: (task: Task) => void;
 }
 
 function BoardColumn({

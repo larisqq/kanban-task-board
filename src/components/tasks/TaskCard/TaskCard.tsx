@@ -4,14 +4,7 @@ import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 import { CalendarDays, GripVertical, Pencil, Trash2 } from "lucide-react";
 
-import { getDueDateStatus } from "../../../utils/date";
-
-function formatDueDate(date?: string | null) {
-  if (!date) return "";
-  const d = new Date(date);
-  if (Number.isNaN(d.getTime())) return "";
-  return d.toLocaleDateString();
-}
+import { formatDueDate, getDueDateStatus } from "../../../utils/date";
 import type { Task } from "../../../types/task";
 
 interface TaskCardProps {
@@ -19,7 +12,7 @@ interface TaskCardProps {
   isOverlay?: boolean;
   isDeleting?: boolean;
   onEdit?: (task: Task) => void;
-  onDelete?: (taskId: string) => Promise<void>;
+  onDelete?: (task: Task) => void;
 }
 
 function TaskCard({
@@ -46,24 +39,6 @@ function TaskCard({
     : undefined;
 
   const dueDateStatus = getDueDateStatus(task.due_date);
-
-  async function handleDelete() {
-    if (!onDelete) {
-      return;
-    }
-
-    const shouldDelete = window.confirm(`Delete "${task.title}"?`);
-
-    if (!shouldDelete) {
-      return;
-    }
-
-    try {
-      await onDelete(task.id);
-    } catch {
-      // Eroarea este gestionată în useTasks.
-    }
-  }
 
   function getDueDateLabel(): string | null {
     if (!task.due_date || !dueDateStatus) {
@@ -122,7 +97,7 @@ function TaskCard({
               className="task-card__action-button task-card__action-button--delete"
               aria-label={`Delete task ${task.title}`}
               disabled={isDeleting}
-              onClick={() => void handleDelete()}
+              onClick={() => onDelete?.(task)}
             >
               <Trash2 size={15} />
             </button>

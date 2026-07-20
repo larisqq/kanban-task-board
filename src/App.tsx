@@ -1,10 +1,11 @@
 import { useMemo, useState } from "react";
 import { Plus, RefreshCw } from "lucide-react";
 
-import TaskBoard from "./components/board/TaskBoard/TaskBoard";
 import BoardToolbar, {
   type PriorityFilter,
 } from "./components/board/BoardToolbar/BoardToolbar";
+import TaskBoard from "./components/board/TaskBoard/TaskBoard";
+import ConfirmDialog from "./components/common/ConfirmDialog/ConfirmDialog";
 import TaskFormModal from "./components/tasks/TaskFormModal/TaskFormModal";
 import { useTasks } from "./hooks/useTasks";
 
@@ -14,6 +15,8 @@ function App() {
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
 
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+
+  const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
 
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -67,6 +70,31 @@ function App() {
     setSelectedTask(null);
   }
 
+  function openDeleteDialog(task: Task) {
+    setTaskToDelete(task);
+  }
+
+  function closeDeleteDialog() {
+    if (deletingTaskId) {
+      return;
+    }
+
+    setTaskToDelete(null);
+  }
+
+  async function handleConfirmDelete() {
+    if (!taskToDelete) {
+      return;
+    }
+
+    try {
+      await deleteTask(taskToDelete.id);
+      setTaskToDelete(null);
+    } catch {
+      // Eroarea este gestionată în useTasks.
+    }
+  }
+
   async function handleTaskSubmit(input: CreateTaskInput | UpdateTaskInput) {
     if (selectedTask) {
       await updateTask(selectedTask.id, input as UpdateTaskInput);
@@ -78,6 +106,8 @@ function App() {
   }
 
   const isSubmittingTask = isCreatingTask || editingTaskId === selectedTask?.id;
+
+  const isConfirmingDelete = deletingTaskId === taskToDelete?.id;
 
   return (
     <div className="app-shell">
@@ -140,7 +170,7 @@ function App() {
             deletingTaskId={deletingTaskId}
             onTaskStatusChange={updateTaskStatus}
             onEditTask={openEditModal}
-            onDeleteTask={deleteTask}
+            onDeleteTask={openDeleteDialog}
           />
         )}
       </main>
@@ -151,6 +181,19 @@ function App() {
         isSubmitting={isSubmittingTask}
         onClose={closeTaskModal}
         onSubmit={handleTaskSubmit}
+      />
+
+      <ConfirmDialog
+        isOpen={Boolean(taskToDelete)}
+        title="Delete task"
+        description={
+          taskToDelete
+            ? `Are you sure you want to delete "${taskToDelete.title}"?`
+            : ""
+        }
+        isConfirming={isConfirmingDelete}
+        onCancel={closeDeleteDialog}
+        onConfirm={handleConfirmDelete}
       />
     </div>
   );

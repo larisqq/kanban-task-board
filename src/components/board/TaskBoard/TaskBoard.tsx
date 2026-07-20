@@ -22,7 +22,7 @@ interface TaskBoardProps {
   deletingTaskId: string | null;
   onTaskStatusChange: (taskId: string, status: TaskStatus) => Promise<void>;
   onEditTask: (task: Task) => void;
-  onDeleteTask: (taskId: string) => Promise<void>;
+  onDeleteTask: (task: Task) => void;
 }
 
 function TaskBoard({
@@ -74,9 +74,7 @@ function TaskBoard({
 
     try {
       await onTaskStatusChange(task.id, targetStatus);
-    } catch {
-      // Eroarea este gestionată în useTasks.
-    }
+    } catch {}
   }
 
   function handleDragCancel() {
