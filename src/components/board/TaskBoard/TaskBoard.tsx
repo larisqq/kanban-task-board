@@ -74,7 +74,9 @@ function TaskBoard({
 
     try {
       await onTaskStatusChange(task.id, targetStatus);
-    } catch {}
+    } catch (caughtError) {
+      console.error("Task status change failed:", caughtError);
+    }
   }
 
   function handleDragCancel() {

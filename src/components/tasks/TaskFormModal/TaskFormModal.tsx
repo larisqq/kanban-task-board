@@ -1,6 +1,6 @@
 import "./TaskFormModal.css";
 
-import { useEffect, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { CalendarDays, X } from "lucide-react";
 
 import type {
@@ -27,43 +27,17 @@ function TaskFormModal({
 }: TaskFormModalProps) {
   const isEditing = Boolean(task);
 
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [priority, setPriority] = useState<TaskPriority>("normal");
-  const [dueDate, setDueDate] = useState("");
+  const [title, setTitle] = useState(task?.title ?? "");
+
+  const [description, setDescription] = useState(task?.description ?? "");
+
+  const [priority, setPriority] = useState<TaskPriority>(
+    task?.priority ?? "normal",
+  );
+
+  const [dueDate, setDueDate] = useState(task?.due_date ?? "");
+
   const [validationError, setValidationError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!isOpen) {
-      return;
-    }
-
-    setTitle(task?.title ?? "");
-    setDescription(task?.description ?? "");
-    setPriority(task?.priority ?? "normal");
-    setDueDate(task?.due_date ?? "");
-    setValidationError(null);
-  }, [isOpen, task]);
-
-  useEffect(() => {
-    if (!isOpen) {
-      return;
-    }
-
-    function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape" && !isSubmitting) {
-        onClose();
-      }
-    }
-
-    document.addEventListener("keydown", handleKeyDown);
-    document.body.style.overflow = "hidden";
-
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-      document.body.style.overflow = "";
-    };
-  }, [isOpen, isSubmitting, onClose]);
 
   if (!isOpen) {
     return null;

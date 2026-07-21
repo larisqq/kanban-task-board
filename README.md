@@ -8,10 +8,6 @@ The application allows users to create, edit, delete, search, filter, and visual
 
 [Open the live application](https://kanban-task-board-puce.vercel.app)
 
-## GitHub Repository
-
-[View the source code](https://github.com/larisqq/kanban-task-board)
-
 ## Features
 
 ### Core functionality
@@ -107,3 +103,4 @@ src/
 │   └── date.ts
 ├── App.tsx
 └── main.tsx
+```

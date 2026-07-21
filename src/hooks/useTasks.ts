@@ -33,29 +33,29 @@ export function useTasks() {
     null,
   );
 
-  const loadTasks = useCallback(async () => {
+ const loadTasks = useCallback(async () => {
+  try {
+    await ensureGuestSession();
+
     setIsLoading(true);
     setError(null);
 
-    try {
-      await ensureGuestSession();
+    const loadedTasks = await getTasks();
 
-      const loadedTasks = await getTasks();
+    setTasks(loadedTasks);
+  } catch (caughtError) {
+    console.error(
+      "Could not load tasks:",
+      caughtError,
+    );
 
-      setTasks(loadedTasks);
-    } catch (caughtError) {
-      console.error(
-        "Could not load tasks:",
-        caughtError,
-      );
-
-      setError(
-        "We could not load your board. Please try again.",
-      );
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+    setError(
+      "We could not load your board. Please try again.",
+    );
+  } finally {
+    setIsLoading(false);
+  }
+}, []);
 
   const createTask = useCallback(
     async (
@@ -242,8 +242,10 @@ export function useTasks() {
   );
 
   useEffect(() => {
+  queueMicrotask(() => {
     void loadTasks();
-  }, [loadTasks]);
+  });
+}, [loadTasks]);
 
   return {
     tasks,
