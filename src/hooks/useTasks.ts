@@ -20,6 +20,8 @@ import type {
   UpdateTaskInput,
 } from "../types/task";
 
+import { toast } from "sonner";
+
 export function useTasks() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -57,79 +59,97 @@ export function useTasks() {
   }
 }, []);
 
-  const createTask = useCallback(
-    async (
-      input: CreateTaskInput,
-    ): Promise<Task> => {
-      setIsCreatingTask(true);
-      setError(null);
+ const createTask = useCallback(
+  async (
+    input: CreateTaskInput,
+  ): Promise<Task> => {
+    setIsCreatingTask(true);
+    setError(null);
 
-      try {
-        const newTask =
-          await createTaskRequest(input);
+    try {
+      const newTask =
+        await createTaskRequest(input);
 
-        setTasks((currentTasks) => [
-          newTask,
-          ...currentTasks,
-        ]);
+      setTasks((currentTasks) => [
+        newTask,
+        ...currentTasks,
+      ]);
 
-        return newTask;
-      } catch (caughtError) {
-        console.error(
-          "Could not create task:",
-          caughtError,
-        );
+      toast.success("Task created", {
+        description: `"${newTask.title}" was added to To Do.`,
+      });
 
-        setError(
-          "The task could not be created. Please try again.",
-        );
+      return newTask;
+    } catch (caughtError) {
+      console.error(
+        "Could not create task:",
+        caughtError,
+      );
 
-        throw caughtError;
-      } finally {
-        setIsCreatingTask(false);
-      }
-    },
-    [],
-  );
+      setError(
+        "The task could not be created. Please try again.",
+      );
 
-  const updateTask = useCallback(
-    async (
-      taskId: string,
-      input: UpdateTaskInput,
-    ): Promise<Task> => {
-      setEditingTaskId(taskId);
-      setError(null);
+      toast.error("Task creation failed", {
+        description:
+          "Please check your connection and try again.",
+      });
 
-      try {
-        const updatedTask =
-          await updateTaskRequest(taskId, input);
+      throw caughtError;
+    } finally {
+      setIsCreatingTask(false);
+    }
+  },
+  [],
+);
 
-        setTasks((currentTasks) =>
-          currentTasks.map((task) =>
-            task.id === updatedTask.id
-              ? updatedTask
-              : task,
-          ),
-        );
+ const updateTask = useCallback(
+  async (
+    taskId: string,
+    input: UpdateTaskInput,
+  ): Promise<Task> => {
+    setEditingTaskId(taskId);
+    setError(null);
 
-        return updatedTask;
-      } catch (caughtError) {
-        console.error(
-          "Could not update task:",
-          caughtError,
-        );
+    try {
+      const updatedTask =
+        await updateTaskRequest(taskId, input);
 
-        setError(
-          "The task could not be updated. Please try again.",
-        );
+      setTasks((currentTasks) =>
+        currentTasks.map((task) =>
+          task.id === updatedTask.id
+            ? updatedTask
+            : task,
+        ),
+      );
 
-        throw caughtError;
-      } finally {
-        setEditingTaskId(null);
-      }
-    },
-    [],
-  );
+      toast.success("Task updated", {
+        description: `"${updatedTask.title}" was saved successfully.`,
+      });
+
+      return updatedTask;
+    } catch (caughtError) {
+      console.error(
+        "Could not update task:",
+        caughtError,
+      );
+
+      setError(
+        "The task could not be updated. Please try again.",
+      );
+
+      toast.error("Task update failed", {
+        description:
+          "Your changes could not be saved.",
+      });
+
+      throw caughtError;
+    } finally {
+      setEditingTaskId(null);
+    }
+  },
+  [],
+);
 
   const updateTaskStatus = useCallback(
     async (
@@ -191,6 +211,11 @@ export function useTasks() {
           "The task could not be moved. Please try again.",
         );
 
+        toast.error("Task could not be moved", {
+          description:
+            "The task was returned to its previous column.",
+        });
+
         throw caughtError;
       }
     },
@@ -198,48 +223,59 @@ export function useTasks() {
   );
 
   const deleteTask = useCallback(
-    async (taskId: string): Promise<void> => {
-      let deletedTask: Task | undefined;
+  async (taskId: string): Promise<void> => {
+    let deletedTask: Task | undefined;
 
-      setError(null);
-      setDeletingTaskId(taskId);
+    setError(null);
+    setDeletingTaskId(taskId);
 
-      setTasks((currentTasks) => {
-        deletedTask = currentTasks.find(
-          (task) => task.id === taskId,
-        );
+    setTasks((currentTasks) => {
+      deletedTask = currentTasks.find(
+        (task) => task.id === taskId,
+      );
 
-        return currentTasks.filter(
-          (task) => task.id !== taskId,
-        );
+      return currentTasks.filter(
+        (task) => task.id !== taskId,
+      );
+    });
+
+    try {
+      await deleteTaskRequest(taskId);
+
+      toast.success("Task deleted", {
+        description: deletedTask
+          ? `"${deletedTask.title}" was removed.`
+          : "The task was removed.",
+      });
+    } catch (caughtError) {
+      console.error(
+        "Could not delete task:",
+        caughtError,
+      );
+
+      if (deletedTask) {
+        setTasks((currentTasks) => [
+          deletedTask as Task,
+          ...currentTasks,
+        ]);
+      }
+
+      setError(
+        "The task could not be deleted. Please try again.",
+      );
+
+      toast.error("Task deletion failed", {
+        description:
+          "The task was restored to your board.",
       });
 
-      try {
-        await deleteTaskRequest(taskId);
-      } catch (caughtError) {
-        console.error(
-          "Could not delete task:",
-          caughtError,
-        );
-
-        if (deletedTask) {
-          setTasks((currentTasks) => [
-            deletedTask as Task,
-            ...currentTasks,
-          ]);
-        }
-
-        setError(
-          "The task could not be deleted. Please try again.",
-        );
-
-        throw caughtError;
-      } finally {
-        setDeletingTaskId(null);
-      }
-    },
-    [],
-  );
+      throw caughtError;
+    } finally {
+      setDeletingTaskId(null);
+    }
+  },
+  [],
+);
 
   useEffect(() => {
   queueMicrotask(() => {
