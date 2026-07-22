@@ -1,0 +1,138 @@
+.priority-select__trigger {
+  display: flex;
+  width: 100%;
+  min-height: 44px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 13px;
+  border: 1px solid #dfe3eb;
+  border-radius: 11px;
+  outline: none;
+  background: #ffffff;
+  color: #202638;
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease,
+    background 150ms ease;
+}
+
+.priority-select__trigger:hover:not(:disabled) {
+  border-color: #cfd4df;
+}
+
+.priority-select__trigger:focus {
+  border-color: #866cf0;
+  box-shadow: 0 0 0 4px rgba(103, 71, 232, 0.11);
+}
+
+.priority-select__trigger:disabled {
+  cursor: not-allowed;
+  background: #f5f6f8;
+  opacity: 0.75;
+}
+
+.priority-select__value,
+.priority-select__item-content {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.priority-select__icon {
+  display: flex;
+  color: #8992a5;
+}
+
+.priority-select__dot {
+  width: 8px;
+  height: 8px;
+  flex: 0 0 auto;
+  border-radius: 999px;
+}
+
+.priority-select__dot--low {
+  background: #34a853;
+}
+
+.priority-select__dot--normal {
+  background: #7c879b;
+}
+
+.priority-select__dot--high {
+  background: #e04f43;
+}
+
+.priority-select__content {
+  z-index: 1300;
+  min-width: var(--radix-select-trigger-width);
+  overflow: hidden;
+  border: 1px solid #e2e5ec;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow:
+    0 18px 40px rgba(30, 40, 70, 0.16),
+    0 5px 14px rgba(30, 40, 70, 0.08);
+  animation: priority-select-enter 140ms ease-out;
+}
+
+.priority-select__viewport {
+  padding: 6px;
+}
+
+.priority-select__item {
+  position: relative;
+  display: flex;
+  min-height: 38px;
+  align-items: center;
+  padding: 0 34px 0 10px;
+  border-radius: 8px;
+  outline: none;
+  color: #3d4557;
+  font-size: 0.86rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.priority-select__item[data-highlighted] {
+  background: #f1effb;
+  color: #5d42d3;
+}
+
+.priority-select__indicator {
+  position: absolute;
+  right: 10px;
+  display: grid;
+  place-items: center;
+  color: #6747e8;
+}
+
+.priority-select__scroll-button {
+  display: grid;
+  height: 26px;
+  place-items: center;
+  color: #7e8799;
+}
+
+.priority-filter-select__trigger {
+  width: auto;
+  min-width: 170px;
+  height: 42px;
+}
+
+@keyframes priority-select-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@media (max-width: 640px) {
+  .priority-filter-select__trigger {
+    width: 100%;
+  }
+}

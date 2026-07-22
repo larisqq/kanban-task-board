@@ -90,8 +90,8 @@ function App() {
     try {
       await deleteTask(taskToDelete.id);
       setTaskToDelete(null);
-    } catch {
-      // Eroarea este gestionată în useTasks.
+    } catch (caughtError) {
+      console.error("Could not delete task:", caughtError);
     }
   }
 
@@ -175,13 +175,16 @@ function App() {
         )}
       </main>
 
-      <TaskFormModal
-        isOpen={isTaskModalOpen}
-        task={selectedTask}
-        isSubmitting={isSubmittingTask}
-        onClose={closeTaskModal}
-        onSubmit={handleTaskSubmit}
-      />
+      {isTaskModalOpen && (
+        <TaskFormModal
+          key={selectedTask?.id ?? "new-task"}
+          isOpen
+          task={selectedTask}
+          isSubmitting={isSubmittingTask}
+          onClose={closeTaskModal}
+          onSubmit={handleTaskSubmit}
+        />
+      )}
 
       <ConfirmDialog
         isOpen={Boolean(taskToDelete)}

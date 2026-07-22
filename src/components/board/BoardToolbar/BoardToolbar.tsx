@@ -4,6 +4,8 @@ import { CheckCircle2, ListTodo, Search, TriangleAlert, X } from "lucide-react";
 
 import type { Task, TaskPriority } from "../../../types/task";
 
+import PriorityFilterSelect from "../../ui/PrioritySelect/PriorityFilterSelect";
+
 export type PriorityFilter = "all" | TaskPriority;
 
 interface BoardToolbarProps {
@@ -94,22 +96,10 @@ function BoardToolbar({
           />
         </label>
 
-        <label className="priority-filter">
-          <span className="sr-only">Filter by priority</span>
-
-          <select
-            value={priorityFilter}
-            aria-label="Filter tasks by priority"
-            onChange={(event) =>
-              onPriorityChange(event.target.value as PriorityFilter)
-            }
-          >
-            <option value="all">All priorities</option>
-            <option value="high">High priority</option>
-            <option value="normal">Normal priority</option>
-            <option value="low">Low priority</option>
-          </select>
-        </label>
+        <PriorityFilterSelect
+          value={priorityFilter}
+          onChange={onPriorityChange}
+        />
 
         {hasActiveFilters && (
           <button

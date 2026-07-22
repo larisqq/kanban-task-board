@@ -1,7 +1,10 @@
 import "./TaskFormModal.css";
 
 import { useState, type FormEvent } from "react";
-import { CalendarDays, X } from "lucide-react";
+import { X } from "lucide-react";
+
+import DatePicker from "../../ui/DatePicker/DatePicker";
+import PrioritySelect from "../../ui/PrioritySelect/PrioritySelect";
 
 import type {
   CreateTaskInput,
@@ -58,12 +61,16 @@ function TaskFormModal({
       return;
     }
 
-    await onSubmit({
-      title: trimmedTitle,
-      description: description.trim() || undefined,
-      priority,
-      due_date: dueDate || null,
-    });
+    try {
+      await onSubmit({
+        title: trimmedTitle,
+        description: description.trim() || undefined,
+        priority,
+        due_date: dueDate || null,
+      });
+    } catch {
+      // Request errors are handled in useTasks and App.
+    }
   }
 
   return (
@@ -103,7 +110,7 @@ function TaskFormModal({
           <button
             type="button"
             className="icon-button"
-            aria-label="Close modal"
+            aria-label="Close task form"
             disabled={isSubmitting}
             onClick={onClose}
           >
@@ -152,39 +159,26 @@ function TaskFormModal({
 
           <div className="task-form__row">
             <div className="form-field">
-              <label htmlFor="task-priority">Priority</label>
+              <span className="form-field__label">Priority</span>
 
-              <select
-                id="task-priority"
+              <PrioritySelect
                 value={priority}
                 disabled={isSubmitting}
-                onChange={(event) =>
-                  setPriority(event.target.value as TaskPriority)
-                }
-              >
-                <option value="low">Low</option>
-                <option value="normal">Normal</option>
-                <option value="high">High</option>
-              </select>
+                onChange={setPriority}
+              />
             </div>
 
             <div className="form-field">
-              <label htmlFor="task-due-date">
+              <span className="form-field__label">
                 Due date
                 <span className="optional-label">Optional</span>
-              </label>
+              </span>
 
-              <div className="date-input-wrapper">
-                <CalendarDays size={17} />
-
-                <input
-                  id="task-due-date"
-                  type="date"
-                  value={dueDate}
-                  disabled={isSubmitting}
-                  onChange={(event) => setDueDate(event.target.value)}
-                />
-              </div>
+              <DatePicker
+                value={dueDate}
+                disabled={isSubmitting}
+                onChange={setDueDate}
+              />
             </div>
           </div>
 
