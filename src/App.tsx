@@ -8,6 +8,7 @@ import TaskBoard from "./components/board/TaskBoard/TaskBoard";
 import ConfirmDialog from "./components/common/ConfirmDialog/ConfirmDialog";
 import TaskFormModal from "./components/tasks/TaskFormModal/TaskFormModal";
 import { useTasks } from "./hooks/useTasks";
+import BoardStats from "./components/board/BoardStats/BoardStats";
 
 import type { CreateTaskInput, Task, UpdateTaskInput } from "./types/task";
 
@@ -153,13 +154,16 @@ function App() {
         )}
 
         {!isLoading && (
-          <BoardToolbar
-            tasks={tasks}
-            searchQuery={searchQuery}
-            priorityFilter={priorityFilter}
-            onSearchChange={setSearchQuery}
-            onPriorityChange={setPriorityFilter}
-          />
+          <>
+            <BoardStats tasks={tasks} />
+
+            <BoardToolbar
+              searchQuery={searchQuery}
+              priorityFilter={priorityFilter}
+              onSearchChange={setSearchQuery}
+              onPriorityChange={setPriorityFilter}
+            />
+          </>
         )}
 
         {isLoading && tasks.length === 0 ? (

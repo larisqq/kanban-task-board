@@ -1,0 +1,116 @@
+.board-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.board-summary__grid {
+  display: grid;
+  grid-template-columns:
+    repeat(4, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.board-summary-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 15px;
+  border: 1px solid #e4e7ef;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow:
+    0 5px 16px rgba(30, 40, 70, 0.04);
+  transition:
+    transform 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.board-summary-card:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 9px 24px rgba(30, 40, 70, 0.08);
+}
+
+.board-summary-card__icon {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 11px;
+  background: #f0edff;
+  color: #6747e8;
+}
+
+.board-summary-card div {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+}
+
+.board-summary-card strong {
+  color: #202638;
+  font-size: 1.15rem;
+  line-height: 1.2;
+}
+
+.board-summary-card div span {
+  margin-top: 3px;
+  color: #858ea1;
+  font-size: 0.76rem;
+}
+
+.board-summary__progress {
+  padding: 16px;
+  border: 1px solid #e4e7ef;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.board-summary__progress-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  color: #626c80;
+  font-size: 0.8rem;
+}
+
+.board-summary__progress-header strong {
+  color: #4f35c8;
+}
+
+.board-summary__progress-track {
+  height: 9px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #eceef4;
+}
+
+.board-summary__progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background:
+    linear-gradient(
+      90deg,
+      #7656ec,
+      #5f8ff2
+    );
+  transition: width 350ms ease;
+}
+
+@media (max-width: 900px) {
+  .board-summary__grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .board-summary__grid {
+    grid-template-columns: 1fr;
+  }
+}
